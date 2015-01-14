@@ -1,4 +1,4 @@
-package de.szut.dqi12.sqlitebrowser.example;
+package de.szut.dqi12.sqlitebrowser;
 
 public class Constants {
 
