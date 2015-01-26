@@ -107,6 +107,7 @@ public class Intro5 {
 
 	private Properties getProperties(String filename) {
 		Properties p = new Properties();
+               
 		try {
 			InputStream inputStream = getClass().getResourceAsStream(
 					Constants.JDBC_PROPERTIES_FILE);
