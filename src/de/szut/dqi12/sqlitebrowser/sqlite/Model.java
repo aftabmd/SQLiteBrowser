@@ -12,14 +12,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SQL {
+public class Model {
 
     public String user;
     public String pass;
     public String url;
     public Connection conn;
 
-    public SQL(String url, String pass, String user) {
+    public Model(String url, String pass, String user) {
         this.url = url;
         this.pass = pass;
         this.user = user;
@@ -45,7 +45,7 @@ public class SQL {
         try {
             conn = DriverManager.getConnection(this.url, this.user, this.pass);
         } catch (SQLException ex) {
-            Logger.getLogger(SQL.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
         return conn;
     }
@@ -57,7 +57,7 @@ public class SQL {
             stat = this.conn.createStatement();
             rs = stat.executeQuery(query);
         } catch (SQLException ex) {
-            Logger.getLogger(SQL.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return rs;
@@ -71,7 +71,7 @@ public class SQL {
                 resultArray.add(resultSet.getString(columnName));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(SQL.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultArray;
@@ -81,7 +81,7 @@ public class SQL {
         try {
             this.conn.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SQL.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
