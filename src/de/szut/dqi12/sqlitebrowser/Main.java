@@ -4,7 +4,7 @@ import de.szut.dqi12.sqlitebrowser.sqlite.Model;
 
 public class Main {
 	public static void main(String[] args) {
-		Model sql = new Model("C:\\Users\\Robin\\Documents\\NetBeansProjects\\SQLiteBrowser\\geodaten.db3", "", "root");
+		Model sql = new Model("jdbc:sqlite:geodaten.db3", "", "root");
                 sql.getConnection();
                 
                 
