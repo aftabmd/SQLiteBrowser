@@ -3,6 +3,7 @@ package de.szut.dqi12.sqlitebrowser.sqlite;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -238,6 +239,29 @@ public class Model {
         }
         return false;
 
+    }
+
+    public boolean addRow(HashMap dataSet, String tableName) {
+        try {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO ? (?) VALUES (?)");
+            StringBuffer bufferCol = new StringBuffer();
+            StringBuffer bufferValue = new StringBuffer();
+            for (Object key : dataSet.keySet()) {
+
+                bufferCol.append(key + ", ");
+                bufferValue.append(dataSet.get(String.valueOf(key) + ", "));
+
+            }
+            ps.setString(1, tableName);
+            ps.setString(2, bufferCol.substring(0, bufferCol.length() - 2));
+            ps.setString(3, bufferValue.substring(0, bufferValue.length() - 2));
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
     }
 
     /**
