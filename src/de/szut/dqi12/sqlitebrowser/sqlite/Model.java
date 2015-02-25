@@ -16,7 +16,9 @@ public class Model {
     private String pass;
     private String url;
     private Connection conn;
-    private String database;
+    private String databaseName;
+    private int start;
+    private int end;
 
     /**
      * Konstruktor
@@ -29,6 +31,8 @@ public class Model {
         this.url = url;
         this.pass = pass;
         this.user = user;
+        this.start = 0;
+        this.end = 20;
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -37,6 +41,14 @@ public class Model {
         }
 
         this.conn = this.getConnection();
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public void setEnd(int end) {
+        this.end = end;
     }
 
     /**
@@ -48,7 +60,7 @@ public class Model {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(this.url, this.user, this.pass);
-            database = conn.getMetaData().getDatabaseProductName();
+            databaseName = conn.getMetaData().getDatabaseProductName();
         } catch (SQLException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -68,20 +80,36 @@ public class Model {
             stat = this.conn.createStatement();
             rs = stat.executeQuery(query);
         } catch (SQLException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
 
         return rs;
     }
-    
-    
-    public String[] getTables(){
-        String[] databases = new String[conn.getMetaData().get];
+
+    /**
+     * Die Tabellennamen der Datenbank werden ausgelesen
+     *
+     * @return Es werden die Tabellennamen in einer ArrayList zurueckgegeben
+     */
+    public ArrayList<String> getTableNames() {
+        Statement stat;
+        ResultSet rs = null;
+        ArrayList<String> tableNames = new ArrayList<>();
+        try {
+            stat = this.conn.createStatement();
+//            rs = stat.executeQuery("SELECT name FROM " + this.databaseName + " WHERE type='table'");
+//            String tablenames = new String();
+            rs = conn.getMetaData().getTables(null, null, "%", null);
+            while (rs.next()) {
+                tableNames.add(rs.getString(3));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return tableNames;
+
     }
-    
-    
-    
-    
 
     /**
      * Eine Tabelle der Datenbank wird entfernt
@@ -123,7 +151,37 @@ public class Model {
     }
 
     /**
-     * Der Inhalt einer Tabelle einer Datenbank wird zurueckgegeben
+     * Eine Tabelle einer Datenbank wird ausgelesen und Convertiert
+     * zurueckgeliefert
+     *
+     * @param name Name der Tabelle
+     * @return Eine HashMap, welche als Key den jeweiligen Spaltennamen enthaelt
+     * und als Value eine Arraylist vom Typ String, mit den jeweiligen Eintragen
+     */
+    public HashMap getTable(String name) {
+        HashMap data = new HashMap<String, ArrayList>();
+        Statement stat;
+        ResultSet rs = null;
+        ArrayList<String> values;
+        try {
+            stat = this.conn.createStatement();
+            rs = stat.executeQuery("select * from " + name);
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                values = new ArrayList<>();
+                while (rs.next()) {
+                    values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
+                }
+                data.put(rs.getMetaData().getColumnLabel(i), values.clone());
+            }
+        } catch (SQLException ex) {
+            return null;
+        }
+
+        return data;
+    }
+
+    /**
+     * Der Inhalt einer Datenbank wird zurueckgegeben
      *
      * @param table name der Tabelle
      * @return Liefert den Inhalt der Tabelle in einer ArrayList zurueck
@@ -134,14 +192,13 @@ public class Model {
         ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("SELECT * FROM " + database + "." + table);
+            rs = stat.executeQuery("SELECT * FROM " + databaseName + "." + table);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
             return null;
         }
         ArrayList<String> resultArray = new ArrayList();
-        HashMap reslut = new HashMap();
 
         try {
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
@@ -203,7 +260,7 @@ public class Model {
         return false;
     }
 
-    /**
+    /**@deprecated 
      * Daten einer Datenbank werden aufbereitet
      *
      * @param resultSet Daten, welche aufbereitet werden sollen
