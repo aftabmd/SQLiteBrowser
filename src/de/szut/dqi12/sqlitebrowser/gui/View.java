@@ -5,14 +5,15 @@
  */
 package de.szut.dqi12.sqlitebrowser.gui;
 
-import de.szut.dqi12.sqlitebrowser.gui.listeners.SaveBoundsListener;
 import de.szut.dqi12.sqlitebrowser.Settings;
+import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeRightClickListener;
+import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeSelectionListener;
+import de.szut.dqi12.sqlitebrowser.gui.listeners.TableRightClickListener;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -20,7 +21,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -29,14 +29,14 @@ import javax.swing.tree.TreeSelectionModel;
 public class View extends JFrame {
     
     public Settings settings;
-    
+
     //Component Defintionen
     private JSplitPane mainPane;
     private JScrollPane leftPane;
     private JScrollPane rightPane;
     
     private JTree dbTree;
-    
+
     //Menubar Definitionen (Menüleiste oben im Programm)
     private JMenuBar bar;
     
@@ -55,12 +55,12 @@ public class View extends JFrame {
     
     private DefaultMutableTreeNode topNode;
     
-    public View(){
+    public View() {
         
         settings = new Settings();
         
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
+        
         initComponents();
         initMenuBar();
         initTree();
@@ -79,11 +79,11 @@ public class View extends JFrame {
         
         setVisible(true);
     }
-        
+
     /**
      * @author Till Schlechtweg
      */
-    private void initComponents(){
+    private void initComponents() {
         bar = new JMenuBar();
         
         infoMenu = new JMenu();
@@ -93,7 +93,7 @@ public class View extends JFrame {
         fileOpenItem = new JMenuItem();
         fileSaveItem = new JMenuItem();
         infoCreditsItem = new JMenuItem();
-    
+        
         topNode = new DefaultMutableTreeNode("Hello");
         
         dbTree = new JTree(topNode);
@@ -107,34 +107,31 @@ public class View extends JFrame {
         sqlField = new JTextField();
     }
     
-    private void initTree(){
-        dbTree.getSelectionModel().setSelectionMode
-            (TreeSelectionModel.SINGLE_TREE_SELECTION);
+    private void initTree() {
         
-        debugTree();
     }
     
-    private void initTable(){
+    private void initTable() {
         dbTable.setModel(new DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "1", "2", "3", "4"
-            }
+                new Object[][]{
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null},
+                    {null, null, null, null}
+                },
+                new String[]{
+                    "1", "2", "3", "4"
+                }
         ));
     }
-    
+
     /**
      * Initialisiert die MenuBar und ihre Komponenten.
-     * 
+     *
      * @author Till Schlechtweg
      */
-    private void initMenuBar(){
-        
+    private void initMenuBar() {
+
         //
         editMenu.setText("Edit");
         fileMenu.setText("File");
@@ -143,7 +140,7 @@ public class View extends JFrame {
         fileOpenItem.setText("open File");
         fileSaveItem.setText("save File in");
         infoCreditsItem.setText("About");
-        
+
         //
         fileMenu.add(fileSaveItem);
         fileMenu.add(fileOpenItem);
@@ -154,24 +151,19 @@ public class View extends JFrame {
         bar.add(infoMenu);
     }
     
-    public void updateTree(ArrayList<String> nodes, DefaultMutableTreeNode rootNode){
+    public void updateTree(ArrayList<String> nodes, DefaultMutableTreeNode rootNode) {
         nodes.stream().forEach((node) -> {
             rootNode.add(new DefaultMutableTreeNode(node));
         });
         topNode.add(rootNode);
     }
-    
+
     /**
-     * 
+     *
      */
-    private void registerListeners(){
-        getContentPane().addComponentListener(new SaveBoundsListener());
-    }
-    
-    public void debugTree(){
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("3");
-        
-        topNode.add(rootNode);
-        
+    private void registerListeners() {
+        dbTree.addTreeSelectionListener(new NodeSelectionListener());
+        dbTree.addMouseListener(new NodeRightClickListener());
+        dbTable.addMouseListener(new TableRightClickListener());
     }
 }

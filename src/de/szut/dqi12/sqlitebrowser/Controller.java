@@ -3,6 +3,7 @@ package de.szut.dqi12.sqlitebrowser;
 import de.szut.dqi12.sqlitebrowser.gui.View;
 import de.szut.dqi12.sqlitebrowser.sqlite.Model;
 import java.util.ArrayList;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -10,24 +11,29 @@ import java.util.ArrayList;
  */
 public class Controller {
     
-    private Model model;
-    private View view;
+    private static Model model;
+    private static View view;
+    public static Controller instance;
     
-    public Controller() {
-        view = new View();
+    private Controller() {
+        
+    }
+    
+    public static Controller getController(){
+        if(instance == null) instance = new Controller();
+        return instance;
     }
     
     public ArrayList<String> executeQuerry(String query){
         return null;
     }
     
-    public ArrayList<String> getTableNames(){
-        
-        return null;
+    public void updateTableNames(){
+        view.updateTree(model.getTableNames(), new DefaultMutableTreeNode("Penis"));
     }
     
     public static void main(String[] args){
-        Controller c = new Controller();
-        
+        view = new View();
+        model = new Model(null, null, null);
     }
 }
