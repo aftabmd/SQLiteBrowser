@@ -16,7 +16,6 @@ public class Model {
     private String pass;
     private String url;
     private Connection conn;
-    private String databaseName;
     private int start;
     private int end;
 
@@ -60,7 +59,6 @@ public class Model {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(this.url, this.user, this.pass);
-            databaseName = conn.getMetaData().getDatabaseProductName();
         } catch (SQLException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -73,17 +71,26 @@ public class Model {
      * @param query
      * @return Die Daten, welche die Datenbank zurueckliefert werden geliefert
      */
-    public ResultSet executeQuery(String query) {
+    public HashMap executeQuery(String query) {
+        HashMap data = new HashMap<String, ArrayList>();
         Statement stat;
         ResultSet rs = null;
+        ArrayList<String> values;
         try {
             stat = this.conn.createStatement();
             rs = stat.executeQuery(query);
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                values = new ArrayList<>();
+                while (rs.next()) {
+                    values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
+                }
+                data.put(rs.getMetaData().getColumnLabel(i), values.clone());
+            }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            return null;
         }
 
-        return rs;
+        return data;
     }
 
     /**
@@ -186,13 +193,13 @@ public class Model {
      * @param table name der Tabelle
      * @return Liefert den Inhalt der Tabelle in einer ArrayList zurueck
      */
-    public ArrayList<String> showColumn(String table) {
+    public ArrayList<String> showColumn(String table, String col) {
 
         Statement stat;
         ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("SELECT * FROM " + databaseName + "." + table);
+            rs = stat.executeQuery("SELECT * FROM " + table);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -201,21 +208,14 @@ public class Model {
         ArrayList<String> resultArray = new ArrayList();
 
         try {
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-
-                try {
-                    while (rs.next()) {
-                        resultArray.add(rs.getString(rs.getMetaData().getColumnName(i)));
-                        if (resultArray.size() > 20) {
-                            break;
-                        }
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+            while (rs.next()) {
+                resultArray.add(rs.getString(col));
+                if (resultArray.size() > 20) {
+                    break;
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            return null;
         }
         return resultArray;
     }
@@ -260,8 +260,8 @@ public class Model {
         return false;
     }
 
-    /**@deprecated 
-     * Daten einer Datenbank werden aufbereitet
+    /**
+     * @deprecated Daten einer Datenbank werden aufbereitet
      *
      * @param resultSet Daten, welche aufbereitet werden sollen
      * @param columnName Name der Spalte, wessen Daten aufbereitet werden sollen
@@ -275,13 +275,19 @@ public class Model {
                 resultArray.add(resultSet.getString(columnName));
                 if (resultArray.size() > 20) {
                     break;
+
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Model.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
 
         return resultArray;
+    }
+
+    public String getDatabaseName() {
+        return this.url;
     }
 
     /**
@@ -291,8 +297,7 @@ public class Model {
         try {
             this.conn.close();
         } catch (SQLException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
-
 }
