@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- *
+ * Der Kontrolleur des SQLiteBrowser.
  * @author Till Schlechtweg
  */
 public class Controller {
@@ -23,6 +23,10 @@ public class Controller {
     public static Controller getController(){
         if(instance == null) instance = new Controller();
         return instance;
+    }
+    
+    public void removeRow(){
+        
     }
     
     public ArrayList<String> executeQuerry(String query){

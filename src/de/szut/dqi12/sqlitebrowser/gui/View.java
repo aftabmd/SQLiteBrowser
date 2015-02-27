@@ -5,7 +5,7 @@
  */
 package de.szut.dqi12.sqlitebrowser.gui;
 
-import de.szut.dqi12.sqlitebrowser.Settings;
+import de.szut.dqi12.sqlitebrowser.util.SettingsUtil;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeRightClickListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeSelectionListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.TableRightClickListener;
@@ -24,11 +24,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
- * @author tsc
+ * @author Till Schlechtweg
  */
 public class View extends JFrame {
     
-    public Settings settings;
+    public SettingsUtil settings;
 
     //Component Defintionen
     private JSplitPane mainPane;
@@ -59,7 +59,7 @@ public class View extends JFrame {
     
     protected View() {
         
-        settings = new Settings();
+        settings = new SettingsUtil();
         
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
@@ -70,10 +70,11 @@ public class View extends JFrame {
         
         registerListeners();
         
-        getContentPane().add(sqlField);
+        
         sqlField.setBounds(100, 100, 0, 0);
         leftPane.setViewportView(dbTree);
         rightPane.setViewportView(dbTable);
+        getContentPane().add(sqlField);
         
         setContentPane(mainPane);
         setJMenuBar(bar);
@@ -114,10 +115,18 @@ public class View extends JFrame {
         sqlField = new JTextField();
     }
     
+    /**
+     * 
+     * @author Till Schlechtweg
+     */
     private void initTree() {
         
     }
     
+    /**
+     * 
+     * @author Till Schlechtweg
+     */
     private void initTable() {
         dbTable.setModel(new DefaultTableModel(
                 new Object[][]{
@@ -158,6 +167,12 @@ public class View extends JFrame {
         bar.add(infoMenu);
     }
     
+    /**
+     * 
+     * @author Till Schlechtweg
+     * @param nodes
+     * @param rootNode 
+     */
     public void updateTree(ArrayList<String> nodes, DefaultMutableTreeNode rootNode) {
         nodes.stream().forEach((node) -> {
             rootNode.add(new DefaultMutableTreeNode(node));
@@ -167,6 +182,7 @@ public class View extends JFrame {
 
     /**
      *
+     * @author Till Schlechtweg
      */
     private void registerListeners() {
         dbTree.addTreeSelectionListener(new NodeSelectionListener());

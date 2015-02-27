@@ -1,6 +1,6 @@
 package de.szut.dqi12.sqlitebrowser.sqlite;
 
-import de.szut.dqi12.sqlitebrowser.Settings;
+import de.szut.dqi12.sqlitebrowser.util.SettingsUtil;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.DriverManager;
@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * 
+ * 
+ * @author Robin Bley
+ */
 public class Model {
 
     private String user;
@@ -30,9 +35,9 @@ public class Model {
      * @param user Benutzername zur Datenbank
      */
     protected Model() {
-        this.url = Settings.DB_URL;
-        this.pass = Settings.DB_PASSWORD;
-        this.user = Settings.DB_USER;
+        this.url = SettingsUtil.DB_URL;
+        this.pass = SettingsUtil.DB_PASSWORD;
+        this.user = SettingsUtil.DB_USER;
         this.start = 0;
         this.end = 20;
 
