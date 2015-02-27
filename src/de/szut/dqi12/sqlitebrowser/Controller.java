@@ -16,7 +16,8 @@ public class Controller {
     public static Controller instance;
     
     private Controller() {
-        
+        view = View.getView();
+        model = Model.getModel();
     }
     
     public static Controller getController(){
@@ -33,7 +34,6 @@ public class Controller {
     }
     
     public static void main(String[] args){
-        view = new View();
-        model = new Model(null, null, null);
+        Controller.getController();
     }
 }

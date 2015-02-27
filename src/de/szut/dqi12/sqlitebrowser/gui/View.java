@@ -55,7 +55,9 @@ public class View extends JFrame {
     
     private DefaultMutableTreeNode topNode;
     
-    public View() {
+    private static View instance = null;
+    
+    protected View() {
         
         settings = new Settings();
         
@@ -78,6 +80,11 @@ public class View extends JFrame {
         pack();
         
         setVisible(true);
+    }
+    
+    public static View getView(){
+        if(instance == null) instance = new View();
+        return instance;
     }
 
     /**
