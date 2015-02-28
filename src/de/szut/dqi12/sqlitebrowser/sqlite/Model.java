@@ -121,8 +121,8 @@ public class Model {
         ArrayList<String> tableNames = new ArrayList<>();
         try {
             //Die namen der Tabellen werden aus den MataDaten der Verbindung zur Datenbank ausgelesen.
-            rs = conn.getMetaData().getTables(null, null, null, 
-         new String[] {"TABLE"});
+            rs = conn.getMetaData().getTables(null, null, null,
+                    new String[]{"TABLE"});
             //Die Namen der Tabellen werden einer ArrayList hinzugefuegt.
             while (rs.next()) {
                 tableNames.add(rs.getString("TABLE_NAME"));
@@ -197,7 +197,7 @@ public class Model {
         HashMap data = new HashMap<String, ArrayList>();
         Statement stat;
         ResultSet rs = null;
-        ArrayList<String> values;
+        ArrayList<ArrayList<String>> values = null;
         try {
             if (orderCol != null) {
                 //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
@@ -226,17 +226,29 @@ public class Model {
             ResultSetMetaData resultMeta = rs.getMetaData();
             int columnCount = resultMeta.getColumnCount();
             
-            //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
-            for (int i = 1; i < columnCount; i++) {
-                values = new ArrayList<>();
-                String cLabel = resultMeta.getColumnLabel(i);
-                //Einer HashMap werden als Key die Spaltennamen der Tabelle uebergeben
-                //und als Values jeweils eine ArrayList mit den jeweiligen Werten der Reihen.
-                while (rs.next()) {
-                    values.add(rs.getString(cLabel));
-                }
-                data.put(cLabel, values.clone());
+            ArrayList<String> cLabels = new ArrayList<>();
+            
+            values = new ArrayList<>();
+            
+            for(int i = 1; i <= columnCount; i++){
+                cLabels.add(resultMeta.getColumnLabel(i));
+                values.add(new ArrayList<>());
             }
+            
+            //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
+            while (rs.next()) {
+                String cLabel = null;
+                for (int i = 1; i <= columnCount; i++) {
+                    cLabel = resultMeta.getColumnLabel(i);
+
+                    values.get(i-1).add(rs.getString(cLabel));
+                }
+            }
+            
+            for(int i = 1; i <= columnCount; i++){
+                data.put(cLabels.get(i-1), values.get(i-1).clone());
+            }
+            
         } catch (SQLException ex) {
             //Bei einem Fehler wird null zurueckgegeben
             ex.printStackTrace();
