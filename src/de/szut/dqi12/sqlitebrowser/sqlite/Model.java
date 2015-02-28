@@ -13,8 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
- * 
+ *
+ *
  * @author Robin Bley
  */
 public class Model {
@@ -25,7 +25,6 @@ public class Model {
     private Connection conn;
     private int start;
     private int end;
-    private static Model instance = null;
 
     /**
      * Konstruktor
@@ -34,7 +33,8 @@ public class Model {
      * @param pass Password des Users der Datenbank
      * @param user Benutzername zur Datenbank
      */
-    protected Model() {
+    public Model() {
+        // Komponenten der Klasse werden initailisiert.
         this.url = SettingsUtil.DB_URL;
         this.pass = SettingsUtil.DB_PASSWORD;
         this.user = SettingsUtil.DB_USER;
@@ -42,17 +42,14 @@ public class Model {
         this.end = 20;
 
         try {
+            //Treiber der Datenbank wird geladen.
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        //Verbindung zur Datenbank wird aufgebaut
         this.conn = this.getConnection();
-    }
-    
-    public static Model getModel(){
-        if(instance == null) instance = new Model();
-        return instance;
+
     }
 
     public void setStart(int start) {
@@ -70,6 +67,7 @@ public class Model {
      */
     public Connection getConnection() {
         try {
+            //Verbindung zur Datenbank wird aufgebaut.
             conn = DriverManager.getConnection(this.url, this.user, this.pass);
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -89,19 +87,26 @@ public class Model {
         ResultSet rs = null;
         ArrayList<String> values;
         try {
+            //Ein "Query" wird ausgefuehrt
             stat = this.conn.createStatement();
             rs = stat.executeQuery(query);
+            // Es wird durch die Spalten einer Tabelle einer Datenbank iteriert.
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                //Fuer jede Spalte wird eine ArrayList erzeugt.
                 values = new ArrayList<>();
+                //Die einzellenen Reihen einer Spalte werden einer ArrayList hinzugefuegt.
                 while (rs.next()) {
                     values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
                 }
+                //Je Spalte erhalte eine HashMap einen key, 
+                //welcher der name der Spalte ist und als Value eine ArrayList mit deren Werten.
                 data.put(rs.getMetaData().getColumnLabel(i), values.clone());
             }
         } catch (SQLException ex) {
+            //Bei einem Fehler wird null zurueckgeliefert
             return null;
         }
-
+        //Die HashMap mit Spaltennamen und Werten wird zurueckgeliefert
         return data;
     }
 
@@ -111,19 +116,19 @@ public class Model {
      * @return Es werden die Tabellennamen in einer ArrayList zurueckgegeben
      */
     public ArrayList<String> getTableNames() {
-        Statement stat;
         ResultSet rs = null;
         ArrayList<String> tableNames = new ArrayList<>();
         try {
-            stat = this.conn.createStatement();
+            //Die namen der Tabellen werden aus den MataDaten der Verbindung zur Datenbank ausgelesen.
             rs = conn.getMetaData().getTables(null, null, "%", null);
+            //Die Namen der Tabellen werden einer ArrayList hinzugefuegt.
             while (rs.next()) {
                 tableNames.add(rs.getString(3));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
+        //Die ArrayList wird zurueckgeliefert.
         return tableNames;
 
     }
@@ -138,13 +143,18 @@ public class Model {
         Statement stat;
         try {
             stat = this.conn.createStatement();
+            //Ein Statement wird vorbereitet, welches eine biliebige Tabelle entfernt.
             PreparedStatement ps = conn.prepareStatement("Drop Table ?");
+            //Dem Statement wird der Name der Tablle hinzugefuegt.
             ps.setString(1, table);
+            //Das Statement wird ausgefuehrt.
             ps.executeUpdate();
+            //es wird true zurueckgelifert
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        //es wird false zurueckgelifert
         return false;
     }
 
@@ -157,9 +167,12 @@ public class Model {
     public boolean createTable(String name) {
         Statement stat;
         try {
+            //Ein Statement wird vorbereitet, welches eine Tabelle erzeugt
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS ?");
+            //Der Name der Tabelle wird dem Statement hinzugefuegt.
             ps.setString(1, name);
+            //Das Statement wird ausgefuehrt.
             ps.executeQuery();
             return true;
         } catch (SQLException ex) {
@@ -183,24 +196,31 @@ public class Model {
         ResultSet rs = null;
         ArrayList<String> values;
         try {
+            //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ?");
+            //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
             ps.setString(1, name);
             ps.setInt(2, this.end);
             ps.setInt(3, this.start);
+            //Das Statement wird ausgefuehrt.
             rs = ps.executeQuery();
 
+            //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
                 values = new ArrayList<>();
+                //Einer HashMap werden als Key die Spaltennamen der Tabelle uebergeben
+                //und als Values jeweils eine ArrayList mit den jeweiligen Werten der Reihen.
                 while (rs.next()) {
                     values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
                 }
                 data.put(rs.getMetaData().getColumnLabel(i), values.clone());
             }
         } catch (SQLException ex) {
+            //Bei einem Fehler wird null zurueckgegeben
             return null;
         }
-
+        //Die HashMap mit Spaltennamen und Werten wird zurueckgegeben
         return data;
     }
 
@@ -215,19 +235,22 @@ public class Model {
         Statement stat;
         ResultSet rs = null;
         try {
+            //Ein Statement wird vorberitet, wleches eine bestimmte Spalte einer Tabelle zurueckliefert.
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement("SELECT ? from ?");
-
+            //Dem Statement wird ein Tabellennamen und ein Spaltennamen uebergeben.
             ps.setString(1, col);
             ps.setString(2, table);
+            //Das Staement wird ausgefuehrt.
             rs = ps.executeQuery();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
+            //Bei einem Fehler wird null zurueckgegeben.
             return null;
         }
+        //Die werde der Spalte werden in einer ArrayList gespeichert und zurueckgegeben.
         ArrayList<String> resultArray = new ArrayList();
-
         try {
             while (rs.next()) {
                 resultArray.add(rs.getString(col));
@@ -250,11 +273,13 @@ public class Model {
     public boolean addCol(String col, String table) {
         Statement stat;
         try {
+            //Ein Statement wird vorbereitet, welches einer Tabelle eine Spalte hinzufuegt.
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement("ALTR TABLE ? ADD ? STRING");
-            
+            //Dem Statement werden Tabellennamen und Spaltennamen hinzugefuegt.
             ps.setString(1, table);
             ps.setString(2, col);
+            //Das Statement wird ausgefuehrt.
             ps.executeUpdate();
             return true;
         } catch (SQLException ex) {
@@ -266,15 +291,20 @@ public class Model {
 
     public boolean addRow(HashMap dataSet, String tableName) {
         try {
+            //Ein Statement wird vorbereitetm wleches einer Tabelle eine anzahl von Werten in bestimmte Spalten hinzufuegt.
             PreparedStatement ps = conn.prepareStatement("INSERT INTO ? (?) VALUES (?)");
+            //Es werden Stringzwischenspeicher erzeugt.
             StringBuffer bufferCol = new StringBuffer();
             StringBuffer bufferValue = new StringBuffer();
+            //Es wird durch die zuveraendernden Spalten iterriert.
             for (Object key : dataSet.keySet()) {
-
+                //Ein String mit den Spaltennamen wird erzeugt.
                 bufferCol.append(key + ", ");
+                //Es wird ein String mit den Werten der Spalten erzeugt.
                 bufferValue.append(dataSet.get(String.valueOf(key) + ", "));
 
             }
+            // Dem Statement wird ein Tabellennamen, Spaltennamen und Werte Hinzugefuegt.
             ps.setString(1, tableName);
             ps.setString(2, bufferCol.substring(0, bufferCol.length() - 2));
             ps.setString(3, bufferValue.substring(0, bufferValue.length() - 2));
@@ -297,8 +327,10 @@ public class Model {
     public boolean delColumn(String col, String table) {
         Statement stat;
         try {
+            //Es wird ein Statement vorbereitet, welches eine Spalte einer Tabelle entfernt.
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement("ALTER TABLE ? DROP COLUMN ?");
+            //Dem Statement wird ein Tabellennamen und ein Spaltennamen uebergeben.
             ps.setString(1, table);
             ps.setString(2, col);
             ps.executeUpdate();
