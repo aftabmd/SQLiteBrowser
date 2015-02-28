@@ -57,11 +57,10 @@ public class Model {
      * @return Eine Verbindung zur Datenbank
      */
     public Connection getConnection() {
-        Connection conn = null;
         try {
             conn = DriverManager.getConnection(this.url, this.user, this.pass);
         } catch (SQLException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return conn;
     }
@@ -105,8 +104,6 @@ public class Model {
         ArrayList<String> tableNames = new ArrayList<>();
         try {
             stat = this.conn.createStatement();
-//            rs = stat.executeQuery("SELECT name FROM " + this.databaseName + " WHERE type='table'");
-//            String tablenames = new String();
             rs = conn.getMetaData().getTables(null, null, "%", null);
             while (rs.next()) {
                 tableNames.add(rs.getString(3));
@@ -127,10 +124,11 @@ public class Model {
      */
     public boolean deleteTable(String table) {
         Statement stat;
-        ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("DROP TABLE " + table);
+            PreparedStatement ps = conn.prepareStatement("Drop Table ?");
+            ps.setString(1, table);
+            ps.executeUpdate();
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -146,10 +144,11 @@ public class Model {
      */
     public boolean createTable(String name) {
         Statement stat;
-        ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("CREATE TABLE IF NOT EXISTS " + name);
+            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS ?");
+            ps.setString(1, name);
+            ps.executeQuery();
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -173,7 +172,12 @@ public class Model {
         ArrayList<String> values;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("select * from " + name);
+            PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ?");
+            ps.setString(1, name);
+            ps.setInt(2, this.end);
+            ps.setInt(3, this.start);
+            rs = ps.executeQuery();
+
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
                 values = new ArrayList<>();
                 while (rs.next()) {
@@ -200,7 +204,11 @@ public class Model {
         ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("SELECT * FROM " + table);
+            PreparedStatement ps = conn.prepareStatement("SELECT ? from ?");
+
+            ps.setString(1, col);
+            ps.setString(2, table);
+            rs = ps.executeQuery();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -229,10 +237,13 @@ public class Model {
      */
     public boolean addCol(String col, String table) {
         Statement stat;
-        ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("ALTER TABLE " + table + " ADD " + col + " String");
+            PreparedStatement ps = conn.prepareStatement("ALTR TABLE ? ADD ? STRING");
+            
+            ps.setString(1, table);
+            ps.setString(2, col);
+            ps.executeUpdate();
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -273,10 +284,12 @@ public class Model {
      */
     public boolean delColumn(String col, String table) {
         Statement stat;
-        ResultSet rs = null;
         try {
             stat = this.conn.createStatement();
-            rs = stat.executeQuery("ALTER TABLE " + table + " DROP COLUMN " + col);
+            PreparedStatement ps = conn.prepareStatement("ALTER TABLE ? DROP COLUMN ?");
+            ps.setString(1, table);
+            ps.setString(2, col);
+            ps.executeUpdate();
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
