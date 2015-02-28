@@ -21,9 +21,22 @@ public class Controller {
     public static Controller instance;
     
     private Controller() {
-        view = View.getView();
-        model = new Model();
         settings = new SettingsUtil();
+        
+        try {
+            settings.updateProperties("jdbc.properties");
+        } catch (IOException ex) {
+            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        view = View.getView();
+        
+        String url = settings.getProperties().getProperty(SettingsUtil.DB_URL);
+        String pass = settings.getProperties().getProperty(SettingsUtil.DB_PASSWORD);
+        String user = settings.getProperties().getProperty(SettingsUtil.DB_USER);
+        String driver = settings.getProperties().getProperty(SettingsUtil.JDBC_DRIVER_NAME);
+        model = new Model(url, pass, user, driver);
+        
     }
     
     public static Controller getController(){
@@ -45,11 +58,5 @@ public class Controller {
     
     public static void main(String[] args){
         Controller.getController();
-        try {
-            Controller.settings.updateProperties("jdbc.properties");
-        } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        System.out.println(SettingsUtil.properties.getProperty(SettingsUtil.JDBC_DRIVER_NAME));
     }
 }

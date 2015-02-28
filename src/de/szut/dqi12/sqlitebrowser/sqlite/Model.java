@@ -33,7 +33,7 @@ public class Model {
      * @param pass Password des Users der Datenbank
      * @param user Benutzername zur Datenbank
      */
-    public Model(String url, String password, String user) {
+    public Model(String url, String password, String user, String driver) {
         // Komponenten der Klasse werden initailisiert.
         this.url = url;
         this.pass = password;
@@ -43,7 +43,7 @@ public class Model {
 
         try {
             //Treiber der Datenbank wird geladen.
-            Class.forName("org.sqlite.JDBC");
+            Class.forName(driver);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
