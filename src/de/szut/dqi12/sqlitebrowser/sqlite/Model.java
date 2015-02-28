@@ -125,6 +125,7 @@ public class Model {
             //Die Namen der Tabellen werden einer ArrayList hinzugefuegt.
             while (rs.next()) {
                 tableNames.add(rs.getString("TABLE_NAME"));
+                System.out.println(rs.getString("TABLE_NAME"));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

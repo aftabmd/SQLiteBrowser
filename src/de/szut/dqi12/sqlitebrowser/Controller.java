@@ -29,14 +29,13 @@ public class Controller {
             Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        view = View.getView();
-        
         String url = settings.getProperties().getProperty(SettingsUtil.DB_URL);
         String pass = settings.getProperties().getProperty(SettingsUtil.DB_PASSWORD);
         String user = settings.getProperties().getProperty(SettingsUtil.DB_USER);
         String driver = settings.getProperties().getProperty(SettingsUtil.JDBC_DRIVER_NAME);
         model = new Model(url, pass, user, driver);
         
+        view = View.getView();
     }
     
     public static Controller getController(){
@@ -59,4 +58,33 @@ public class Controller {
     public static void main(String[] args){
         Controller.getController();
     }
+
+    /*
+    Getter und Setter des Controllers.
+    */
+    public static Model getModel() {
+        return model;
+    }
+
+    public static void setModel(Model model) {
+        Controller.model = model;
+    }
+
+    public static View getView() {
+        return view;
+    }
+
+    public static void setView(View view) {
+        Controller.view = view;
+    }
+
+    public static SettingsUtil getSettings() {
+        return settings;
+    }
+
+    public static void setSettings(SettingsUtil settings) {
+        Controller.settings = settings;
+    }
+    
+    
 }

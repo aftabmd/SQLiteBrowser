@@ -5,11 +5,13 @@
  */
 package de.szut.dqi12.sqlitebrowser.gui;
 
+import de.szut.dqi12.sqlitebrowser.Controller;
 import de.szut.dqi12.sqlitebrowser.util.SettingsUtil;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeRightClickListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.NodeSelectionListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.TableRightClickListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -128,17 +130,25 @@ public class View extends JFrame {
      * @author Till Schlechtweg
      */
     private void initTable() {
-        dbTable.setModel(new DefaultTableModel(
-                new Object[][]{
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null},
-                    {null, null, null, null}
-                },
-                new String[]{
-                    "1", "2", "3", "4"
-                }
-        ));
+        System.out.println(Controller.getModel().getTableNames().size());
+        HashMap<String, ArrayList> data = Controller.getModel().getTable(Controller.getModel().getTableNames().get(0), "");
+        
+        ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+        ArrayList<String> tableNames = new ArrayList<>();
+        
+        for( String name: (String[])data.keySet().toArray() ){
+            tableData.add(data.get(name));
+            tableNames.add(name);
+        }
+        
+        DefaultTableModel tableModel = new DefaultTableModel();
+        int i = 0;
+        
+        for( ArrayList<String> temp: tableData){
+            tableModel.addColumn(tableNames.get(i), temp.toArray());
+            i++;
+        }
+        dbTable.setModel(tableModel);
     }
 
     /**

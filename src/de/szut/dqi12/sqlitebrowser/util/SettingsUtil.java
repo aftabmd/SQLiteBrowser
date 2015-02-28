@@ -69,7 +69,7 @@ public class SettingsUtil {
         properties.setProperty(SettingsUtil.VIEW_WIDTH, "800");
         properties.setProperty(SettingsUtil.VIEW_X_POSITION, "0");
         properties.setProperty(SettingsUtil.VIEW_Y_POSITION, "0");
-        properties.setProperty(SettingsUtil.DB_URL, "jdbc:sqlite:.geodaten.db3");
+        properties.setProperty(SettingsUtil.DB_URL, "jdbc:sqlite:geodaten.db3");
         properties.setProperty(SettingsUtil.DB_USER, "root");
         properties.setProperty(SettingsUtil.DB_PASSWORD, "");
 
