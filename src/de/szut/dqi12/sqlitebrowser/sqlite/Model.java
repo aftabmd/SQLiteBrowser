@@ -33,11 +33,11 @@ public class Model {
      * @param pass Password des Users der Datenbank
      * @param user Benutzername zur Datenbank
      */
-    public Model() {
+    public Model(String url, String password, String user) {
         // Komponenten der Klasse werden initailisiert.
-        this.url = SettingsUtil.DB_URL;
-        this.pass = SettingsUtil.DB_PASSWORD;
-        this.user = SettingsUtil.DB_USER;
+        this.url = url;
+        this.pass = password;
+        this.user = user;
         this.start = 0;
         this.end = 20;
 
