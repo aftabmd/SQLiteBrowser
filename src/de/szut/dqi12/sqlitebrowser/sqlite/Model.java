@@ -120,10 +120,11 @@ public class Model {
         ArrayList<String> tableNames = new ArrayList<>();
         try {
             //Die namen der Tabellen werden aus den MataDaten der Verbindung zur Datenbank ausgelesen.
-            rs = conn.getMetaData().getTables(null, null, "%", null);
+            rs = conn.getMetaData().getTables(null, null, null, 
+         new String[] {"TABLE"});
             //Die Namen der Tabellen werden einer ArrayList hinzugefuegt.
             while (rs.next()) {
-                tableNames.add(rs.getString(3));
+                tableNames.add(rs.getString("TABLE_NAME"));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
