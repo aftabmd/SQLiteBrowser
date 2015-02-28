@@ -226,9 +226,8 @@ public class Model {
             ResultSetMetaData resultMeta = rs.getMetaData();
             int columnCount = resultMeta.getColumnCount();
             
-            
             //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
-            for (int i = 1; i < columnCount-1; i++) {
+            for (int i = 1; i < columnCount; i++) {
                 values = new ArrayList<>();
                 String cLabel = resultMeta.getColumnLabel(i);
                 //Einer HashMap werden als Key die Spaltennamen der Tabelle uebergeben
