@@ -187,24 +187,39 @@ public class Model {
      * zurueckgeliefert
      *
      * @param name Name der Tabelle
+     * @param orderCol Name der Spalte, nach welcher die Tabelle geordnet wird.
      * @return Eine HashMap, welche als Key den jeweiligen Spaltennamen enthaelt
      * und als Value eine Arraylist vom Typ String, mit den jeweiligen Eintragen
      */
-    public HashMap getTable(String name) {
+    public HashMap getTable(String name, String orderCol) {
         HashMap data = new HashMap<String, ArrayList>();
         Statement stat;
         ResultSet rs = null;
         ArrayList<String> values;
         try {
-            //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
-            stat = this.conn.createStatement();
-            PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ?");
-            //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
-            ps.setString(1, name);
-            ps.setInt(2, this.end);
-            ps.setInt(3, this.start);
-            //Das Statement wird ausgefuehrt.
-            rs = ps.executeQuery();
+            if (orderCol != null) {
+                //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
+                stat = this.conn.createStatement();
+                PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ? ORDER BY ?");
+                //Der Name der Tabelle, ein start der Werte, einer Reihenfolge der Ordnung 
+                //und ein Ende der Werte werden dem Statement hinzugefuegt.
+                ps.setString(1, name);
+                ps.setInt(2, this.end);
+                ps.setInt(3, this.start);
+                ps.setString(4, orderCol);
+                //Das Statement wird ausgefuehrt.
+                rs = ps.executeQuery();
+            } else {
+                //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
+                stat = this.conn.createStatement();
+                PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ?");
+                //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
+                ps.setString(1, name);
+                ps.setInt(2, this.end);
+                ps.setInt(3, this.start);
+                //Das Statement wird ausgefuehrt.
+                rs = ps.executeQuery();
+            }
 
             //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
             for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
