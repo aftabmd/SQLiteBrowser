@@ -1,4 +1,4 @@
-package de.szut.dqi12.sqlitebrowser;
+package de.szut.dqi12.sqlitebrowser.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +11,7 @@ import java.util.Properties;
  * 
  * @author Till Schlechtweg
  */
-public class Settings {
+public class SettingsUtil {
 
     public static String JDBC_DRIVER_NAME = "jdbc.driver";
 
@@ -26,7 +26,7 @@ public class Settings {
     public static String VIEW_Y_POSITION = "view.y";
 
     public static String SETTINGS_FILE = "sqlitebrowser.properties";
-
+    
     /**
      * Liest die Einstellungen der @see Settings#SETTINGS_FILE ein.
      * 
@@ -36,25 +36,32 @@ public class Settings {
      */
     private int updateProperties(String filename) {
         Properties prop = new Properties();
-        File file = new File(Settings.SETTINGS_FILE);
+        File file = new File(SettingsUtil.SETTINGS_FILE);
         
         if(!file.exists()){
             return 0;
         }
         
         try {
-            InputStream inputStream = getClass().getResourceAsStream(Settings.SETTINGS_FILE);
-            prop.load(inputStream);
-            inputStream.close();
+            try (InputStream inputStream = getClass().getResourceAsStream(SettingsUtil.SETTINGS_FILE)) {
+                prop.load(inputStream);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return 1;
     }
     
+    /**
+     *  Speichert die Properties ab.
+     * 
+     * @param url
+     * @param user
+     * @param pass 
+     */
     public void saveProperties(String url, String user, String pass){
         Properties prop = new Properties();
-        File file = new File(Settings.SETTINGS_FILE);
+        File file = new File(SettingsUtil.SETTINGS_FILE);
         
         prop.setProperty("jdbc.driver", this.JDBC_DRIVER_NAME);
         prop.setProperty("view.height", this.VIEW_HEIGHT);
