@@ -130,14 +130,14 @@ public class View extends JFrame {
      * @author Till Schlechtweg
      */
     private void initTable() {
-        HashMap<String, ArrayList> data = Controller.getModel().getTable(Controller.getModel().getTableNames().get(0), "");
+        HashMap<String, ArrayList> data = Controller.getModel().getTable(Controller.getModel().getTableNames().get(0), null);
         
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
         ArrayList<String> tableNames = new ArrayList<>();
         
-        for( String name: (String[])data.keySet().toArray() ){
-            tableData.add(data.get(name));
-            tableNames.add(name);
+        for( Object name: data.keySet().toArray() ){
+            tableData.add(data.get(name.toString()));
+            tableNames.add(name.toString());
         }
         
         DefaultTableModel tableModel = new DefaultTableModel();

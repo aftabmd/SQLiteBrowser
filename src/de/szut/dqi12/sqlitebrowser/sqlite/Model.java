@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -213,28 +214,33 @@ public class Model {
             } else {
                 //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
                 stat = this.conn.createStatement();
-                PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ?");
+                PreparedStatement ps = conn.prepareStatement("select * FROM " + name);
                 //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
-                ps.setString(1, name);
-                ps.setInt(2, this.end);
-                ps.setInt(3, this.start);
+                //ps.setString(1, name);
+                //ps.setInt(2, this.end);
+                //ps.setInt(3, this.start);
                 //Das Statement wird ausgefuehrt.
                 rs = ps.executeQuery();
             }
 
+            ResultSetMetaData resultMeta = rs.getMetaData();
+            int columnCount = resultMeta.getColumnCount();
+            
+            
             //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+            for (int i = 1; i < columnCount-1; i++) {
                 values = new ArrayList<>();
+                String cLabel = resultMeta.getColumnLabel(i);
                 //Einer HashMap werden als Key die Spaltennamen der Tabelle uebergeben
                 //und als Values jeweils eine ArrayList mit den jeweiligen Werten der Reihen.
                 while (rs.next()) {
-                    values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
+                    values.add(rs.getString(cLabel));
                 }
-                data.put(rs.getMetaData().getColumnLabel(i), values.clone());
+                data.put(cLabel, values.clone());
             }
         } catch (SQLException ex) {
             //Bei einem Fehler wird null zurueckgegeben
-            return null;
+            ex.printStackTrace();
         }
         //Die HashMap mit Spaltennamen und Werten wird zurueckgegeben
         return data;
