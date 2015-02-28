@@ -130,7 +130,6 @@ public class View extends JFrame {
      * @author Till Schlechtweg
      */
     private void initTable() {
-        System.out.println(Controller.getModel().getTableNames().size());
         HashMap<String, ArrayList> data = Controller.getModel().getTable(Controller.getModel().getTableNames().get(0), "");
         
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
