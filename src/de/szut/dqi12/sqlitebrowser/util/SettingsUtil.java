@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Verschiedene Einstellungen für den SQLiteBrowser.
@@ -14,7 +16,7 @@ import java.util.Properties;
  * @author Till Schlechtweg
  */
 public class SettingsUtil {
-
+    //Keys der Properties 
     public static String JDBC_DRIVER_NAME = "jdbc.driver";
 
     public static String DB_URL = "db.url";
@@ -34,22 +36,24 @@ public class SettingsUtil {
     }
 
     /**
-     * Liest die Einstellungen der @see SettingsUtil#SETTINGS_FILE ein.
+     * Liest die Einstellungen der jdbc.properties ein.
      *
      * @author Harm Hörnlein & Till Schlechtweg
-     * @param filename
-     * @return 0, wenn Updaten der Properties fehlgeschlagen ist und 1 wenn es
+     * @return false wenn Updaten der Properties fehlgeschlagen ist und true wenn es
      * erfolgreich war.
-     * @throws java.io.IOException
      */
-    public boolean updateProperties(String filename) throws IOException {
-        File file = new File(filename);
+    public boolean updateProperties() {
+        File file = new File("jdbc.properties");
 
         if (!file.exists()) {
-            if (!file.createNewFile()) {
-                return false;
-            } else {
-                return saveStandardProperties(filename);
+            try {
+                if (!file.createNewFile()) {
+                    return false;
+                } else {
+                    return saveStandardProperties();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SettingsUtil.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -63,7 +67,12 @@ public class SettingsUtil {
         return true;
     }
 
-    private boolean saveStandardProperties(String filename) {
+    /**
+     * Standard Einstellungen, hart gecoded.
+     * 
+     * @return Ob das Speichern der Standard Einstellungen funktioniert hat.
+     */
+    private boolean saveStandardProperties() {
         properties.setProperty(SettingsUtil.JDBC_DRIVER_NAME, "org.sqlite.JDBC");
         properties.setProperty(SettingsUtil.VIEW_HEIGHT, "600");
         properties.setProperty(SettingsUtil.VIEW_WIDTH, "800");
@@ -73,8 +82,17 @@ public class SettingsUtil {
         properties.setProperty(SettingsUtil.DB_USER, "root");
         properties.setProperty(SettingsUtil.DB_PASSWORD, "");
 
-        File file = new File(filename);
+        return saveProperties();
+    }
 
+    /**
+     * Speichert die Properties ab.
+     *
+     * @return Ob das Abspeichern geklappt hat oder nicht.
+     */
+    public boolean saveProperties() {
+        File file = new File("jdbc.properties");
+        
         try {
             OutputStream outputStream = new FileOutputStream(file);
             properties.store(outputStream, "Settings for SQLLiteBrowser");
@@ -84,30 +102,11 @@ public class SettingsUtil {
         return true;
     }
 
-    /**
-     * Speichert die Properties ab.
-     *
-     * @param url
-     * @param user
-     * @param pass
-     */
-    public void saveProperties(String filename) {
-        File file = new File(filename);
-
-        try {
-            OutputStream outputStream = new FileOutputStream(file);
-            properties.store(outputStream, "Settings for SQLLiteBrowser");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void setProperty(String key, String value) {
+        this.properties.setProperty(key, value);
     }
-
-    public Properties getProperties() {
-        return properties;
+    
+    public String getProperty(String key){
+        return this.properties.getProperty(key);
     }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
-    }
-
 }

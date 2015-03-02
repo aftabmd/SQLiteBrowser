@@ -75,6 +75,17 @@ public class Model {
         }
         return conn;
     }
+    
+    public void setConnection(Connection conn){
+        this.conn = conn;
+    }
+    
+    public void updateConnection(String url, String user, String pass){
+        this.url = url;
+        this.user = user;
+        this.pass = pass;
+        setConnection(getConnection());
+    }
 
     /**
      * Ein SQL-Befehl wird auf der Datenbank ausgefuehrt
@@ -83,25 +94,39 @@ public class Model {
      * @return Die Daten, welche die Datenbank zurueckliefert werden geliefert
      */
     public HashMap executeQuery(String query) {
-        HashMap data = new HashMap<String, ArrayList>();
+        HashMap data = new HashMap<>();
         Statement stat;
         ResultSet rs = null;
-        ArrayList<String> values;
+        ArrayList<ArrayList<String>> values;
         try {
             //Ein "Query" wird ausgefuehrt
             stat = this.conn.createStatement();
             rs = stat.executeQuery(query);
             // Es wird durch die Spalten einer Tabelle einer Datenbank iteriert.
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                //Fuer jede Spalte wird eine ArrayList erzeugt.
-                values = new ArrayList<>();
-                //Die einzellenen Reihen einer Spalte werden einer ArrayList hinzugefuegt.
-                while (rs.next()) {
-                    values.add(rs.getString(rs.getMetaData().getColumnLabel(i)));
+            ResultSetMetaData resultMeta = rs.getMetaData();
+            int columnCount = resultMeta.getColumnCount();
+            
+            ArrayList<String> cLabels = new ArrayList<>();
+            
+            values = new ArrayList<>();
+            
+            for(int i = 1; i <= columnCount; i++){
+                cLabels.add(resultMeta.getColumnLabel(i));
+                values.add(new ArrayList<>());
+            }
+            
+            //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
+            while (rs.next()) {
+                String cLabel = null;
+                for (int i = 1; i <= columnCount; i++) {
+                    cLabel = resultMeta.getColumnLabel(i);
+
+                    values.get(i-1).add(rs.getString(cLabel));
                 }
-                //Je Spalte erhalte eine HashMap einen key, 
-                //welcher der name der Spalte ist und als Value eine ArrayList mit deren Werten.
-                data.put(rs.getMetaData().getColumnLabel(i), values.clone());
+            }
+            
+            for(int i = 1; i <= columnCount; i++){
+                data.put(cLabels.get(i-1), values.get(i-1).clone());
             }
         } catch (SQLException ex) {
             //Bei einem Fehler wird null zurueckgeliefert
@@ -401,7 +426,7 @@ public class Model {
     }
 
     public String getDatabaseName() {
-        return this.url;
+        return this.url.substring(12);
     }
 
     /**

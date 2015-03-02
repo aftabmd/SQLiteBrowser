@@ -24,16 +24,12 @@ public class Controller {
     private Controller() {
         settings = new SettingsUtil();
 
-        try {
-            settings.updateProperties("jdbc.properties");
-        } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        settings.updateProperties();
 
-        String url = settings.getProperties().getProperty(SettingsUtil.DB_URL);
-        String pass = settings.getProperties().getProperty(SettingsUtil.DB_PASSWORD);
-        String user = settings.getProperties().getProperty(SettingsUtil.DB_USER);
-        String driver = settings.getProperties().getProperty(SettingsUtil.JDBC_DRIVER_NAME);
+        String url = settings.getProperty(SettingsUtil.DB_URL);
+        String pass = settings.getProperty(SettingsUtil.DB_PASSWORD);
+        String user = settings.getProperty(SettingsUtil.DB_USER);
+        String driver = settings.getProperty(SettingsUtil.JDBC_DRIVER_NAME);
         model = new Model(url, pass, user, driver);
 
         view = View.getView();
@@ -50,11 +46,12 @@ public class Controller {
 
     }
 
-    public ArrayList<String> executeQuerry(String query) {
-        return null;
+    public void executeQuerry(String query) {
+        view.updateTable(model.executeQuery(query));
     }
 
     public void updateTree() {
+        System.out.println(model.getDatabaseName());
         view.updateTree(model.getTableNames(), new DefaultMutableTreeNode(model.getDatabaseName()));
     }
 
