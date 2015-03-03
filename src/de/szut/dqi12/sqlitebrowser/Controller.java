@@ -21,6 +21,9 @@ public class Controller {
     public static SettingsUtil settings;
     public static Controller instance;
 
+    /**
+     * Startet alles was zur Ausführung des SQLiteBrowsers benötigt wird.
+     */
     private Controller() {
         settings = new SettingsUtil();
 
@@ -35,6 +38,7 @@ public class Controller {
         view = View.getView();
     }
 
+    
     public static Controller getController() {
         if (instance == null) {
             instance = new Controller();
@@ -50,6 +54,9 @@ public class Controller {
         view.updateTable(model.executeQuery(query));
     }
 
+    /**
+     * Updated den Tree des Views mithilfe von Daten aus dem Model, sodass die View nicht auf das Model zugreifen muss.
+     */
     public void updateTree() {
         view.updateTree(model.getTableNames(), new DefaultMutableTreeNode(model.getDatabaseName()));
     }
@@ -58,6 +65,10 @@ public class Controller {
         Controller.getController();
     }
 
+    /**
+     * Updated den Table der View mithilfe von Daten aus dem Model.
+     * @param tableName Der Name der anzuzeigenden Tabelle
+     */
     public void updateTable(String tableName) {
         view.updateTable(model.getTable(tableName, null));
     }

@@ -31,8 +31,9 @@ public class Model {
      * Konstruktor
      *
      * @param url Pfad zur Datenbank
-     * @param pass Password des Users der Datenbank
+     * @param password Password des Datenbankbenutzers
      * @param user Benutzername zur Datenbank
+     * @param driver Name des zu ladenenden Treibers
      */
     public Model(String url, String password, String user, String driver) {
         // Komponenten der Klasse werden initailisiert.
@@ -48,8 +49,12 @@ public class Model {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        //Verbindung zur Datenbank wird aufgebaut
-        this.conn = this.getConnection();
+        try {
+            //Verbindung zur Datenbank wird aufgebaut
+            this.conn = DriverManager.getConnection(this.url, this.user, this.pass);
+        } catch (SQLException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -75,12 +80,12 @@ public class Model {
         }
         return conn;
     }
-    
-    public void setConnection(Connection conn){
+
+    public void setConnection(Connection conn) {
         this.conn = conn;
     }
-    
-    public void updateConnection(String url, String user, String pass){
+
+    public void updateConnection(String url, String user, String pass) {
         this.url = url;
         this.user = user;
         this.pass = pass;
@@ -90,7 +95,7 @@ public class Model {
     /**
      * Ein SQL-Befehl wird auf der Datenbank ausgefuehrt
      *
-     * @param query
+     * @param query Der Auszuführende SQL-Befehl
      * @return Die Daten, welche die Datenbank zurueckliefert werden geliefert
      */
     public HashMap executeQuery(String query) {
@@ -105,28 +110,28 @@ public class Model {
             // Es wird durch die Spalten einer Tabelle einer Datenbank iteriert.
             ResultSetMetaData resultMeta = rs.getMetaData();
             int columnCount = resultMeta.getColumnCount();
-            
+
             ArrayList<String> cLabels = new ArrayList<>();
-            
+
             values = new ArrayList<>();
-            
-            for(int i = 1; i <= columnCount; i++){
+
+            for (int i = 1; i <= columnCount; i++) {
                 cLabels.add(resultMeta.getColumnLabel(i));
                 values.add(new ArrayList<>());
             }
-            
+
             //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
             while (rs.next()) {
                 String cLabel = null;
                 for (int i = 1; i <= columnCount; i++) {
                     cLabel = resultMeta.getColumnLabel(i);
 
-                    values.get(i-1).add(rs.getString(cLabel));
+                    values.get(i - 1).add(rs.getString(cLabel));
                 }
             }
-            
-            for(int i = 1; i <= columnCount; i++){
-                data.put(cLabels.get(i-1), values.get(i-1).clone());
+
+            for (int i = 1; i <= columnCount; i++) {
+                data.put(cLabels.get(i - 1), values.get(i - 1).clone());
             }
         } catch (SQLException ex) {
             //Bei einem Fehler wird null zurueckgeliefert
@@ -169,7 +174,7 @@ public class Model {
     public boolean deleteTable(String table) {
         try {
             //Ein Statement wird vorbereitet, welches eine biliebige Tabelle entfernt.
-            PreparedStatement ps = conn.prepareStatement("DROP TABLE "+table);
+            PreparedStatement ps = conn.prepareStatement("DROP TABLE " + table);
             //Das Statement wird ausgefuehrt.
             ps.executeUpdate();
             //es wird true zurueckgelifert
@@ -193,7 +198,7 @@ public class Model {
         try {
             //Ein Statement wird vorbereitet, welches eine Tabelle erzeugt
             stat = this.conn.createStatement();
-            String query = "CREATE TABLE IF NOT EXISTS '"+name+"'";
+            String query = "CREATE TABLE IF NOT EXISTS '" + name + "'";
             System.out.println(query);
             PreparedStatement ps = conn.prepareStatement(query);
             //Das Statement wird ausgefuehrt.
@@ -237,10 +242,10 @@ public class Model {
                 //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
                 stat = this.conn.createStatement();
                 PreparedStatement ps;
-                if(this.start == 0){
+                if (this.start == 0) {
                     ps = conn.prepareStatement("select * FROM " + name);
-                }else{
-                    ps = conn.prepareStatement("select * FROM " + name + " LIMIT "+ this.start);
+                } else {
+                    ps = conn.prepareStatement("select * FROM " + name + " LIMIT " + this.start);
                 }
                 //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
                 //ps.setString(1, name);
@@ -252,30 +257,30 @@ public class Model {
 
             ResultSetMetaData resultMeta = rs.getMetaData();
             int columnCount = resultMeta.getColumnCount();
-            
+
             ArrayList<String> cLabels = new ArrayList<>();
-            
+
             values = new ArrayList<>();
-            
-            for(int i = 1; i <= columnCount; i++){
+
+            for (int i = 1; i <= columnCount; i++) {
                 cLabels.add(resultMeta.getColumnLabel(i));
                 values.add(new ArrayList<>());
             }
-            
+
             //Die Namen der Spalten der Tabelle werden ausgelesen und durch ihnen iterriert.
             while (rs.next()) {
                 String cLabel = null;
                 for (int i = 1; i <= columnCount; i++) {
                     cLabel = resultMeta.getColumnLabel(i);
 
-                    values.get(i-1).add(rs.getString(cLabel));
+                    values.get(i - 1).add(rs.getString(cLabel));
                 }
             }
-            
-            for(int i = 1; i <= columnCount; i++){
-                data.put(cLabels.get(i-1), values.get(i-1).clone());
+
+            for (int i = 1; i <= columnCount; i++) {
+                data.put(cLabels.get(i - 1), values.get(i - 1).clone());
             }
-            
+
         } catch (SQLException ex) {
             //Bei einem Fehler wird null zurueckgegeben
             ex.printStackTrace();
@@ -288,6 +293,7 @@ public class Model {
      * Der Inhalt einer Datenbank wird zurueckgegeben
      *
      * @param table name der Tabelle
+     * @param col Die Spalte die gezeigt werden soll
      * @return Liefert den Inhalt der Tabelle in einer ArrayList zurueck
      */
     public ArrayList<String> showColumn(String table, String col) {

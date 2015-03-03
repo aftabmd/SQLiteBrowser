@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 public class SaveBoundsListener extends ComponentAdapter {
 
     @Override
-    public void componentResized(ComponentEvent evt){
+    public void componentResized(ComponentEvent evt) {
         JOptionPane.showMessageDialog(null, "Penis");
     }
 }

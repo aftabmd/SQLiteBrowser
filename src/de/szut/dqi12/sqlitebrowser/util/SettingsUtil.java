@@ -16,7 +16,9 @@ import java.util.logging.Logger;
  * @author Till Schlechtweg
  */
 public class SettingsUtil {
+
     //Keys der Properties 
+
     public static String JDBC_DRIVER_NAME = "jdbc.driver";
 
     public static String DB_URL = "db.url";
@@ -38,9 +40,9 @@ public class SettingsUtil {
     /**
      * Liest die Einstellungen der jdbc.properties ein.
      *
-     * @author Harm Hörnlein & Till Schlechtweg
-     * @return false wenn Updaten der Properties fehlgeschlagen ist und true wenn es
-     * erfolgreich war.
+     * @author Harm Hörnlein und Till Schlechtweg
+     * @return false wenn Updaten der Properties fehlgeschlagen ist und true
+     * wenn es erfolgreich war.
      */
     public boolean updateProperties() {
         File file = new File("jdbc.properties");
@@ -69,7 +71,7 @@ public class SettingsUtil {
 
     /**
      * Standard Einstellungen, hart gecoded.
-     * 
+     *
      * @return Ob das Speichern der Standard Einstellungen funktioniert hat.
      */
     private boolean saveStandardProperties() {
@@ -92,7 +94,7 @@ public class SettingsUtil {
      */
     public boolean saveProperties() {
         File file = new File("jdbc.properties");
-        
+
         try {
             OutputStream outputStream = new FileOutputStream(file);
             properties.store(outputStream, "Settings for SQLLiteBrowser");
@@ -105,8 +107,8 @@ public class SettingsUtil {
     public void setProperty(String key, String value) {
         this.properties.setProperty(key, value);
     }
-    
-    public String getProperty(String key){
+
+    public String getProperty(String key) {
         return this.properties.getProperty(key);
     }
 }

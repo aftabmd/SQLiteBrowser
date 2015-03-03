@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.szut.dqi12.sqlitebrowser.gui.listeners;
 
 import de.szut.dqi12.sqlitebrowser.Controller;
@@ -16,7 +11,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Manfred
+ * @author Till Schlechtweg
  */
 public class EditDeleteTableListener implements ActionListener {
 

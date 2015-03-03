@@ -19,17 +19,17 @@ public class AboutListener implements ActionListener {
         JDialog about = new JDialog();
         JPanel grid = new JPanel();
         JLabel aboutL = new JLabel();
-        
+
         int x = Controller.getView().getX() + Controller.getView().getWidth() / 2 - grid.getWidth() / 2;
         int y = Controller.getView().getY() + Controller.getView().getHeight() / 2 - grid.getHeight() / 2;
-        
+
         aboutL.setText("SQLiteBrowser made by Robin Bley and Till Schlechtweg");
-        
+
         grid.setLayout(new GridLayout());
         grid.add(aboutL);
-        
+
         about.setBounds(x, y, 350, 75);
-        
+
         about.setContentPane(grid);
         about.setVisible(true);
     }
