@@ -6,7 +6,9 @@
 package de.szut.dqi12.sqlitebrowser.gui;
 
 import de.szut.dqi12.sqlitebrowser.Controller;
+import de.szut.dqi12.sqlitebrowser.gui.listeners.AboutListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.EditDeleteTableListener;
+import de.szut.dqi12.sqlitebrowser.gui.listeners.EditLimitListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.ExecuteQueryListener;
 import de.szut.dqi12.sqlitebrowser.gui.listeners.FileOpenListener;
 import de.szut.dqi12.sqlitebrowser.util.SettingsUtil;
@@ -31,72 +33,71 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Till Schlechtweg
  */
 public class View extends JFrame {
-    
+
     public SettingsUtil settings;
 
     //Component Defintionen
     private JSplitPane mainPane;
     private JScrollPane leftPane;
     private JScrollPane rightPane;
-    
+
     private JTree dbTree;
 
     //Menubar Definitionen (Menüleiste oben im Programm)
     private JMenuBar bar;
-    
+
     private JMenu fileMenu;
     private JMenu editMenu;
     private JMenu infoMenu;
     private JMenu executeMenu;
-    
+
     private JMenuItem editDeleteTableItem;
-    private JMenuItem editCreateTableItem;
     private JMenuItem executeQueryItem;
-    private JMenuItem fileSaveItem;
+    private JMenuItem editLimitItem;
     private JMenuItem fileOpenItem;
     private JMenuItem infoChangeItem;
     private JMenuItem infoCreditsItem;
-    
+
     private JTable dbTable;
-    
+
     private JTextField sqlField;
-    
+
     private DefaultMutableTreeNode topNode;
-    
+
     private static View instance = null;
-    
+
     protected View() {
-        
+
         settings = new SettingsUtil();
-        
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        
+
         int x = Integer.valueOf(Controller.getSettings().getProperty(SettingsUtil.VIEW_X_POSITION));
         int y = Integer.valueOf(Controller.getSettings().getProperty(SettingsUtil.VIEW_Y_POSITION));
         int width = Integer.valueOf(Controller.getSettings().getProperty(SettingsUtil.VIEW_HEIGHT));
         int height = Integer.valueOf(Controller.getSettings().getProperty(SettingsUtil.VIEW_WIDTH));
-        
+
         setBounds(x, y, width, height);
-        
+
         initComponents();
         initMenuBar();
         initTree();
         initTable();
-        
+
         registerListeners();
-        
+
         sqlField.setBounds(100, 100, 0, 0);
         leftPane.setViewportView(dbTree);
         rightPane.setViewportView(dbTable);
         getContentPane().add(sqlField);
-        
+
         setContentPane(mainPane);
         setJMenuBar(bar);
         pack();
-        
+
         setVisible(true);
     }
-    
+
     public static View getView() {
         if (instance == null) {
             instance = new View();
@@ -109,30 +110,29 @@ public class View extends JFrame {
      */
     private void initComponents() {
         bar = new JMenuBar();
-        
+
         executeMenu = new JMenu();
         infoMenu = new JMenu();
         fileMenu = new JMenu();
         editMenu = new JMenu();
-        
+
+        editLimitItem = new JMenuItem();
         editDeleteTableItem = new JMenuItem();
-        editCreateTableItem = new JMenuItem();
         executeQueryItem = new JMenuItem();
         fileOpenItem = new JMenuItem();
-        fileSaveItem = new JMenuItem();
         infoCreditsItem = new JMenuItem();
         infoChangeItem = new JMenuItem();
-        
+
         topNode = new DefaultMutableTreeNode(Controller.getModel().getDatabaseName());
-        
+
         dbTree = new JTree(topNode);
         dbTable = new JTable();
-        
+
         leftPane = new JScrollPane();
         rightPane = new JScrollPane();
-        
+
         mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
-        
+
         sqlField = new JTextField();
     }
 
@@ -142,7 +142,7 @@ public class View extends JFrame {
      */
     private void initTree() {
         dbTree.setShowsRootHandles(true);
-        
+
         for (String name : Controller.getModel().getTableNames()) {
             topNode.add(new DefaultMutableTreeNode(name));
         }
@@ -154,20 +154,22 @@ public class View extends JFrame {
      */
     private void initTable() {
         dbTable.setEnabled(false);
-        
+        dbTable.setDragEnabled(false);
+        dbTable.setAutoCreateRowSorter(true);
+
         HashMap<String, ArrayList> data = Controller.getModel().getTable(Controller.getModel().getTableNames().get(0), null);
-        
+
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
         ArrayList<String> tableNames = new ArrayList<>();
-        
+
         for (Object name : data.keySet().toArray()) {
             tableData.add(data.get(name.toString()));
             tableNames.add(name.toString());
         }
-        
+
         DefaultTableModel tableModel = new DefaultTableModel();
         int i = 0;
-        
+
         for (ArrayList<String> temp : tableData) {
             tableModel.addColumn(tableNames.get(i), temp.toArray());
             i++;
@@ -187,19 +189,17 @@ public class View extends JFrame {
         fileMenu.setText("file");
         infoMenu.setText("settings");
         executeMenu.setText("execute");
-        
-        editDeleteTableItem.setText("delete table");
-        editCreateTableItem.setText("create table");
-        fileOpenItem.setText("open file");
-        fileSaveItem.setText("save file in");
+
+        editLimitItem.setText("set LIMIT");
+        editDeleteTableItem.setText("drop TABLE");
+        fileOpenItem.setText("open FILE");
         infoCreditsItem.setText("about");
-        infoChangeItem.setText("change settings");
+        infoChangeItem.setText("change SETTINGS");
         executeQueryItem.setText("execute SELECT");
 
         //füge die MenuItems den Menus hinzu
+        editMenu.add(editLimitItem);
         editMenu.add(editDeleteTableItem);
-        editMenu.add(editCreateTableItem);
-        fileMenu.add(fileSaveItem);
         fileMenu.add(fileOpenItem);
         infoMenu.add(infoChangeItem);
         infoMenu.add(infoCreditsItem);
@@ -228,19 +228,19 @@ public class View extends JFrame {
         topNode.setUserObject(rootNode.toString());
         dbTree.updateUI();
     }
-    
+
     public void updateTable(HashMap<String, ArrayList> data) {
         ArrayList<ArrayList<String>> tableData = new ArrayList<>();
         ArrayList<String> tableNames = new ArrayList<>();
-        
+
         for (Object name : data.keySet().toArray()) {
             tableData.add(data.get(name.toString()));
             tableNames.add(name.toString());
         }
-        
+
         DefaultTableModel tableModel = new DefaultTableModel();
         int i = 0;
-        
+
         for (ArrayList<String> temp : tableData) {
             tableModel.addColumn(tableNames.get(i), temp.toArray());
             i++;
@@ -258,5 +258,7 @@ public class View extends JFrame {
         infoChangeItem.addActionListener(new SettingsChangeListener());
         executeQueryItem.addActionListener(new ExecuteQueryListener());
         editDeleteTableItem.addActionListener(new EditDeleteTableListener());
+        infoCreditsItem.addActionListener(new AboutListener());
+        editLimitItem.addActionListener(new EditLimitListener());
     }
 }

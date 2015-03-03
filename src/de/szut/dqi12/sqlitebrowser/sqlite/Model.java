@@ -167,13 +167,9 @@ public class Model {
      * @return liefert true oder false zurueck ob die operation erfolgte
      */
     public boolean deleteTable(String table) {
-        Statement stat;
         try {
-            stat = this.conn.createStatement();
             //Ein Statement wird vorbereitet, welches eine biliebige Tabelle entfernt.
-            PreparedStatement ps = conn.prepareStatement("Drop Table ?");
-            //Dem Statement wird der Name der Tablle hinzugefuegt.
-            ps.setString(1, table);
+            PreparedStatement ps = conn.prepareStatement("DROP TABLE "+table);
             //Das Statement wird ausgefuehrt.
             ps.executeUpdate();
             //es wird true zurueckgelifert
@@ -191,14 +187,15 @@ public class Model {
      * @param name name der Tabelle der Datenbank
      * @return liefert true oder false zurueck ob die operation erfolgte
      */
+    @Deprecated
     public boolean createTable(String name) {
         Statement stat;
         try {
             //Ein Statement wird vorbereitet, welches eine Tabelle erzeugt
             stat = this.conn.createStatement();
-            PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS ?");
-            //Der Name der Tabelle wird dem Statement hinzugefuegt.
-            ps.setString(1, name);
+            String query = "CREATE TABLE IF NOT EXISTS '"+name+"'";
+            System.out.println(query);
+            PreparedStatement ps = conn.prepareStatement(query);
             //Das Statement wird ausgefuehrt.
             ps.executeQuery();
             return true;
@@ -239,7 +236,12 @@ public class Model {
             } else {
                 //Ein Statement wird vorbereitet, welches die Daten einer Tabelle ausliest.
                 stat = this.conn.createStatement();
-                PreparedStatement ps = conn.prepareStatement("select * FROM " + name);
+                PreparedStatement ps;
+                if(this.start == 0){
+                    ps = conn.prepareStatement("select * FROM " + name);
+                }else{
+                    ps = conn.prepareStatement("select * FROM " + name + " LIMIT "+ this.start);
+                }
                 //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
                 //ps.setString(1, name);
                 //ps.setInt(2, this.end);

@@ -42,16 +42,15 @@ public class Controller {
         return instance;
     }
 
-    public void removeRow() {
-
-    }
-
+    /**
+     * Kommuniziert zwischen Model and View um die Abfrage auszuführen.
+     * @param query Die auszuführende Abfrage (SELECT only)
+     */
     public void executeQuerry(String query) {
         view.updateTable(model.executeQuery(query));
     }
 
     public void updateTree() {
-        System.out.println(model.getDatabaseName());
         view.updateTree(model.getTableNames(), new DefaultMutableTreeNode(model.getDatabaseName()));
     }
 

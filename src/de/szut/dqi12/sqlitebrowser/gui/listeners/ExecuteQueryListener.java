@@ -22,11 +22,6 @@ public class ExecuteQueryListener implements ActionListener {
         JDialog sChange = new JDialog(Controller.getView());
         JPanel grid = new JPanel();
         
-        int x = Controller.getView().getX()+Controller.getView().getWidth()/2-sChange.getWidth()/2;
-        int y = Controller.getView().getY()+Controller.getView().getHeight()/2-sChange.getHeight()/2;
-        
-        sChange.setBounds(x, y, sChange.getWidth(), sChange.getHeight());
-        
         sChange.setTitle("Query");
         sChange.setSize(450, 50);
         sChange.setResizable(false);
@@ -48,6 +43,11 @@ public class ExecuteQueryListener implements ActionListener {
         grid.add(queryField);
         
         grid.add(save);
+        
+        int x = Controller.getView().getX()+Controller.getView().getWidth()/2-sChange.getWidth()/2;
+        int y = Controller.getView().getY()+Controller.getView().getHeight()/2-sChange.getHeight()/2;
+        
+        sChange.setBounds(x, y, sChange.getWidth(), sChange.getHeight());
         
         sChange.setContentPane(grid);
         sChange.setVisible(true);
