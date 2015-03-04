@@ -192,18 +192,17 @@ public class Model {
      * @param keys Spaltennamen der neuen Tabelle
      * @return liefert true oder false zurueck ob die operation erfolgte
      */
-    public boolean createTable(String name, ArrayList<String> keys) {
+    public boolean createTable(String name, HashMap<String, String> keys) {
         Statement stat;
         try {
             
             //Ein Query wird vorbereitet, welches einen Table erstellt mit den uebergebenen Attributen.
             StringBuilder buffer = new StringBuilder("CREATE TABLE IF NOT EXISTS " + name + "(");
-            for (String key : keys) {
-                buffer.append(key + "STRING NOT NULL,");
-            }
+            keys.keySet().stream().forEach((key) -> {
+                buffer.append(key).append(" ").append(keys.get(key)).append(" NOT NULL,");
+            });
             buffer.deleteCharAt(buffer.length() - 1);
             buffer.append(");");
-
             //Ein Statement wird vorbereitet, welches eine Tabelle erzeugt
             stat = this.conn.createStatement();
             PreparedStatement ps = conn.prepareStatement(buffer.toString());
