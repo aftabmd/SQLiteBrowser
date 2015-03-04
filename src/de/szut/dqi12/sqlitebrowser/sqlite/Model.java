@@ -1,6 +1,5 @@
 package de.szut.dqi12.sqlitebrowser.sqlite;
 
-import de.szut.dqi12.sqlitebrowser.util.SettingsUtil;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.DriverManager;
@@ -190,17 +189,24 @@ public class Model {
      * Eine neue Tabelle wird in der Datenbank erstellt
      *
      * @param name name der Tabelle der Datenbank
+     * @param keys Spaltennamen der neuen Tabelle
      * @return liefert true oder false zurueck ob die operation erfolgte
      */
-    @Deprecated
-    public boolean createTable(String name) {
+    public boolean createTable(String name, ArrayList<String> keys) {
         Statement stat;
         try {
+            
+            //Ein Query wird vorbereitet, welches einen Table erstellt mit den uebergebenen Attributen.
+            StringBuilder buffer = new StringBuilder("CREATE TABLE IF NOT EXISTS " + name + "(");
+            for (String key : keys) {
+                buffer.append(key + "STRING NOT NULL,");
+            }
+            buffer.deleteCharAt(buffer.length() - 1);
+            buffer.append(");");
+
             //Ein Statement wird vorbereitet, welches eine Tabelle erzeugt
             stat = this.conn.createStatement();
-            String query = "CREATE TABLE IF NOT EXISTS '" + name + "'";
-            System.out.println(query);
-            PreparedStatement ps = conn.prepareStatement(query);
+            PreparedStatement ps = conn.prepareStatement(buffer.toString());
             //Das Statement wird ausgefuehrt.
             ps.executeQuery();
             return true;
@@ -232,6 +238,7 @@ public class Model {
                 PreparedStatement ps = conn.prepareStatement("select * from ? LIMIT ? OFFSET ? ORDER BY ?");
                 //Der Name der Tabelle, ein start der Werte, einer Reihenfolge der Ordnung 
                 //und ein Ende der Werte werden dem Statement hinzugefuegt.
+                ps.setCursorName("?");
                 ps.setString(1, name);
                 ps.setInt(2, this.end);
                 ps.setInt(3, this.start);
@@ -247,11 +254,6 @@ public class Model {
                 } else {
                     ps = conn.prepareStatement("select * FROM " + name + " LIMIT " + this.start);
                 }
-                //Der Name der Tabelle, ein start der Werte und ein Ende der Werte werden dem Statement hinzugefuegt.
-                //ps.setString(1, name);
-                //ps.setInt(2, this.end);
-                //ps.setInt(3, this.start);
-                //Das Statement wird ausgefuehrt.
                 rs = ps.executeQuery();
             }
 
